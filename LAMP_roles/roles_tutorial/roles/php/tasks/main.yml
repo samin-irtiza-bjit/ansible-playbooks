@@ -1,0 +1,4 @@
+- name: Install php & php-mysql
+  yum:
+    name: "{{pkg_list}}"
+    state: present

@@ -1,0 +1,20 @@
+- name: Download MySQL Community Repo
+  get_url:
+    url: "{{repo_link}}"
+    dest: /tmp
+
+- name: Install MySQL Community Repo
+  yum:
+    name: /tmp/mysql-community-release-el7-7.noarch.rpm
+    state: present
+
+- name: Install MySQL
+  yum:
+    name: mysql-server
+    state: present
+
+- name: Start and Enable MySQL
+  service:
+    name: mysqld
+    state: started
+    enabled: yes

@@ -1,0 +1,74 @@
+---
+- name: Setup LAMP stack
+  # hosts: centos
+  become: yes
+
+  vars:
+    pkg_list:
+      - httpd
+      - php
+      - php-mysql
+      - mysql-server
+
+    srvc_list:
+      - name: httpd
+        state: started
+        enabled: yes
+      - name: mysqld
+        state: started
+        enabled: yes
+
+    server_address: 192.168.56.107
+
+  tasks:
+
+    - name: Download MySQL Community Repo
+      get_url:
+        url: http://repo.mysql.com/mysql-community-release-el7-7.noarch.rpm
+        dest: /tmp
+
+    - name: Install MySQL Community Repo
+      yum:
+        name: /tmp/mysql-community-release-el7-7.noarch.rpm
+        state: present
+
+
+    - name: Install Apache, PHP & MySQL
+      yum:
+        name: "{{pkg_list}}"
+        state: present
+
+    - name: Start and Enable Apache and MySQL
+      service:
+        name: "{{item.name}}"
+        state: "{{item.state}}"
+        enabled: "{{item.enabled}}"
+      with_items: "{{srvc_list}}"
+
+    - name: Restart Apache service
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Apply Jinja Template
+      template:
+        src: /home/ansible/playbooks/home_cfg.conf.j2
+        dest: /etc/httpd/conf.d/home_cfg.conf
+    - name: Copy HTML files
+      copy:
+        src: /home/ansible/playbooks/templates/index.php
+        dest: /var/www/html/index.php
+
+    - name: Start firewalld
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Set Firewall rule
+      firewalld:
+        port: 80/tcp
+        permanent: true
+        state: enabled
+        immediate: yes
+

@@ -1,0 +1,97 @@
+---
+- name: Install LAMP on Ubuntu 
+  hosts: ubuntu
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install MySQL
+      apt:
+        name: mysql-server
+        state: present
+    
+    - name: Start and Enable mysql.service
+      service:
+        name: mysql.service
+        state: started
+        enabled: yes
+
+    - name: Installing Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Installation install software-properties-common
+      apt: name=software-properties-common
+
+    - name: "Repo PHP 7.4"
+      apt_repository:
+        repo="ppa:ondrej/php"
+   
+    - name: "Updating the repo"
+      apt: update_cache=yes
+
+    - name: Installation PHP 7.4
+      apt: name=php7.4 state=present
+
+    - name: install lamp stack
+      apt:
+        pkg:
+          - php7.4-mysql
+          - php7.4-curl
+          - php7.4-json
+          - php7.4-cgi
+          - php7.4-xsl
+          - php7.4-cgi
+          - php7.4-gd
+          - php7.4-mbstring
+          - php7.4-zip
+          - php7.4-xmlrpc
+          - php7.4-soap
+          - php7.4-intl
+          - libapache2-mod-php
+        state: present
+        update_cache: yes
+
+    - name: Allow incoming connections on port 80
+      ufw:
+        rule: allow
+        port: '80'
+
+    - name: Copy Nginx sites-enabled file
+      copy:
+        src: /home/ansible/playbooks/default
+        dest: /etc/nginx/sites-enabled/default
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Restart Nginx
+    
+    - name: Copy Nginx sites-available file
+      copy:
+        src: /home/ansible/playbooks/default
+        dest: /etc/nginx/sites-available/default
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Restart Nginx
+
+    - name: Copy web files to /var/www/html
+      copy:
+        src: /home/ansible/playbooks/templates/index.php
+        dest: /var/www/html/index.php
+        owner: root
+        group: root
+        mode: "0755"
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+

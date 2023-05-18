@@ -1,0 +1,7 @@
+<VirtualHost *:{{listen_port}}>
+    DocumentRoot "/var/www/html/"
+    ServerName {{server_address}}
+    ErrorLog /var/log/httpd/error.log
+    CustomLog /var/log/httpd/access.log combined
+    # Other directives here
+</VirtualHost>
