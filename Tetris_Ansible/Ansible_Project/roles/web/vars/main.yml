@@ -1,0 +1,4 @@
+---
+httpd_port: 80
+mysql_port: 3306
+repository: /var/lib/jenkins/workspace/Ansible_Project

@@ -1,0 +1,19 @@
+GRANT ALL PRIVILEGES ON *.* TO 'tetris'@'192.168.56.111' IDENTIFIED BY
+'tetrispass' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+USE tetris;
+
+CREATE TABLE Users (
+  Username VARCHAR(50) PRIMARY KEY,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Password VARCHAR(50) NOT NULL,
+  Display VARCHAR(50) NOT NULL
+);
+CREATE TABLE Scores (
+  Username VARCHAR(50) NOT NULL,
+  Score INT NOT NULL,
+  PRIMARY KEY (Username, Score)
+);
+
